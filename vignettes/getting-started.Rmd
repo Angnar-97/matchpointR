@@ -1,0 +1,97 @@
+---
+title: "Getting started with matchpointR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with matchpointR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+```{r setup}
+library(matchpointR)
+```
+
+## Overview
+
+`matchpointR` provides a small, consistent family of functions for
+scraping [wtatennis.com](https://www.wtatennis.com) into tidy data
+frames:
+
+| Function                      | Purpose                                    |
+|-------------------------------|--------------------------------------------|
+| `wta_player_url()`            | Build canonical player URLs.               |
+| `wta_get_player_basics()`     | One-row tibble with bio + images.          |
+| `wta_get_player_overview()`   | Singles & Doubles career highlights.       |
+| `wta_get_player_matches()`    | One row per match, entire history.         |
+| `wta_get_rankings()`          | Current singles / doubles leaderboard.     |
+| `wta_get_stats()`             | Stat leaderboards (aces, winners, ...).    |
+
+Every function that talks to the network opens (and closes) its own
+headless Chrome session through `chromote`.
+
+## A worked example: Kateřina Siniaková
+
+```{r}
+url <- wta_player_url(320301, "katerina-siniakova")
+
+bio <- wta_get_player_basics(url, download_images = FALSE)
+bio
+```
+
+`download_images = TRUE` (the default) additionally downloads the
+headshot and the nationality flag into `magick-image` list-columns — set
+it to `FALSE` when you only need the metadata.
+
+### Singles vs Doubles highlights
+
+```{r}
+wta_get_player_overview(url)
+```
+
+### Full match history
+
+```{r}
+matches <- wta_get_player_matches(url)
+head(matches)
+```
+
+`wta_get_player_matches()` clicks the *Show more* button repeatedly until
+no more matches are loaded. Raise `max_clicks` only if you hit the
+safety cap on a very long career.
+
+## Tour-wide data
+
+### Live rankings
+
+```{r}
+wta_get_rankings("singles", top = 50)
+wta_get_rankings("doubles", top = 50)
+```
+
+### Statistical leaderboards
+
+```{r}
+wta_get_stats("aces", top = 25)
+wta_get_stats("first-serve-percentage", top = 25)
+```
+
+The `metric` argument maps directly to the path segment at
+`https://www.wtatennis.com/stats/<metric>`. Browse the site for the
+available slugs.
+
+## Tips
+
+- **Coercion.** All columns are returned as character to stay faithful
+  to the rendered page. Cast to numeric/date downstream.
+- **Selector drift.** If a function suddenly returns zero rows, the
+  site's CSS classes have probably been renamed — open an issue.
+- **Rate limiting.** `chromote` hits the site as a real browser; be
+  considerate if you are iterating over many players.

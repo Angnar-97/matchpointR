@@ -1,0 +1,53 @@
+# wta_scraper_functions.R --------------------------------------------------
+# Utility functions to scrape data from https://www.wtatennis.com
+# Part of the **BreakPointR** package – generated 2025‑04‑28
+# -------------------------------------------------------------------------
+
+#' @title Helper: get fully‑rendered HTML via Chromote
+#' @description Opens the URL in a headless Chrome session, waits for
+#'   dynamic content, optionally clicks a “Show more” button repeatedly and
+#'   returns the complete HTML as character.
+#' @param url Character. Destination URL.
+#' @param wait Numeric. Seconds to wait after initial navigation. Default 5.
+#' @param click_more_selector Optional CSS selector for a “load more” button.
+#' @param max_clicks Integer. Safety cap for number of clicks. Default 50.
+#' @return A character string containing the full page source.
+#' @keywords internal
+#' @importFrom chromote ChromoteSession
+.chromote_get_html <- function(url, wait = 5,
+                               click_more_selector = NULL,
+                               max_clicks = 50) {
+  ss <- chromote::ChromoteSession$new()
+  on.exit(try(ss$close(), silent = TRUE), add = TRUE)
+
+  ss$Page$navigate(url)
+  Sys.sleep(wait)
+
+  # click the “Show more” (or any) button until it disappears -----------
+  if (!is.null(click_more_selector)) {
+    for (i in seq_len(max_clicks)) {
+      present <- ss$Runtime$evaluate(
+        sprintf("document.querySelector('%s') !== null", click_more_selector)
+      )$result$value
+      if (!isTRUE(present)) break
+      ss$Runtime$evaluate(
+        sprintf("document.querySelector('%s').click()", click_more_selector)
+      )
+      Sys.sleep(1)
+    }
+  }
+
+  html <- ss$Runtime$evaluate("document.documentElement.outerHTML")$result$value
+  html
+}
+
+#' @title Read dynamic HTML into xml2 document
+#' @inheritParams .chromote_get_html
+#' @return xml2::xml_document
+#' @keywords internal
+#' @importFrom xml2 read_html
+.read_html_dynamic <- function(url, wait = 5, click_more_selector = NULL) {
+  html <- .chromote_get_html(url, wait = wait,
+                             click_more_selector = click_more_selector)
+  xml2::read_html(html)
+}

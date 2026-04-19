@@ -1,0 +1,168 @@
+# -------------------------------------------------------------------------
+#  Player basic info -------------------------------------------------------
+
+#' @title Get basic bio for a WTA player
+#' @param player_url Character. Full URL to the player page (either
+#'   #overview or root). You can build it as
+#'   `sprintf("https://www.wtatennis.com/players/%s", id)`.
+#' @return A tibble (1 row) with name, birth_date, nationality, birth_place,
+#'   height, handedness, plus list columns for `player_image` and
+#'   `nationality_flag` (both `magick-image`).
+#' @export
+#' @examples
+#' # x <- wta_get_player_basics("https://www.wtatennis.com/players/320301")
+#' # print(x)
+#' @importFrom rvest html_node html_nodes html_text html_attr
+#' @importFrom tibble tibble
+#' @importFrom stringr str_squish
+#' @importFrom magick image_read
+#' @importFrom rsvg image_read_svg
+wta_get_player_basics <- function(player_url) {
+
+  page <- .read_html_dynamic(player_url)
+
+  nombre <- page |>
+    rvest::html_node(".profile-header-info .profile-header__name") |>
+    rvest::html_text(trim = TRUE) |>
+    stringr::str_squish()
+
+  # foto -------------------------------------------------------------------
+  foto <- page |>
+    rvest::html_node(".profile-header-headshot.full-body img, .fade-in-on-load.is-loaded") |>
+    rvest::html_attr("src")
+  if (is.na(foto)) foto <- NA_character_
+  player_img <- tryCatch(magick::image_read(foto), error = function(e) NA)
+
+  # nacionalidad y bandera --------------------------------------------------
+  nacionalidad <- page |>
+    rvest::html_node(".profile-header-info__nationality") |>
+    rvest::html_text(trim = TRUE) |>
+    stringr::str_squish()
+
+  flag_src <- page |>
+    rvest::html_node(".profile-header-info__nationalityFlag") |>
+    rvest::html_attr("src")
+  flag_src <- paste0("https://www.wtatennis.com", flag_src)
+  flag_img <- image_read_svg(flag_src)
+
+
+  # stats básicos -----------------------------------------------------------
+  stats <- page |>
+    rvest::html_nodes(".profile-header-info__detail-stat--small") |>
+    rvest::html_text(trim = TRUE) |>
+    stringr::str_squish()
+
+  tibble::tibble(
+    name = nombre,
+    birth_date   = stats[3],
+    nationality  = nacionalidad,
+    birth_place  = stats[4],
+    height       = stats[1],
+    handedness   = stats[2],
+    player_image      = list(player_img),
+    nationality_flag  = list(flag_img)
+  )
+}
+
+
+# backward‑compat alias ----------------------------------------------------
+#' @rdname wta_get_player_basics
+#' @export
+get_player_basics <- wta_get_player_basics
+
+# -------------------------------------------------------------------------
+#  Player overview (Singles & Doubles) -------------------------------------
+
+#' @title Get “Singles / Doubles” overview panel for a player
+#' @param player_url Character. URL to player overview (can include #overview)
+#' @return Tibble with two rows (Singles, Doubles) and columns:
+#'   current_ranking, career_high, win_rate_year, win_rate_career,
+#'   year_titles, career_titles, prize_money_year, prize_money_career.
+#' @export
+#' @importFrom purrr map
+#' @importFrom dplyr tibble
+wta_get_player_overview <- function(player_url) {
+
+  ss <- chromote::ChromoteSession$new()
+  on.exit(try(ss$close(), silent = TRUE), add = TRUE)
+
+  ss$Page$navigate(player_url)
+  Sys.sleep(5)
+
+  click_and_capture <- function(idx) {
+    ss$Runtime$evaluate(
+      sprintf("document.querySelectorAll('.profile-header-toggle__switch-selector')[%s].click();", idx - 1)
+    )
+    Sys.sleep(1.5)
+    ss$Runtime$evaluate("document.documentElement.outerHTML")$result$value
+  }
+
+  html_s <- click_and_capture(1)
+  html_d <- click_and_capture(2)
+
+  parse_vals <- function(html) {
+    xml2::read_html(html) |>
+      rvest::html_nodes(".profile-header-stats__value") |>
+      rvest::html_text(trim = TRUE)
+  }
+
+  singles   <- parse_vals(html_s)
+  doubles   <- parse_vals(html_d)
+  clean_vec <- function(x) purrr::map_chr(x, stringr::str_squish)
+
+  overview <- dplyr::tibble(
+    stats              = c("Singles", "Doubles"),
+    current_ranking    = c(clean_vec(singles)[1], clean_vec(doubles)[1]),
+    career_high        = c(clean_vec(singles)[7], clean_vec(doubles)[7]),
+    win_rate_year      = c(clean_vec(singles)[5], clean_vec(doubles)[5]),
+    win_rate_career    = c(clean_vec(singles)[11], clean_vec(doubles)[11]),
+    year_titles        = c(clean_vec(singles)[2], clean_vec(doubles)[2]),
+    career_titles      = c(clean_vec(singles)[8], clean_vec(doubles)[8]),
+    prize_money_year   = c(clean_vec(singles)[3], clean_vec(doubles)[3]),
+    prize_money_career = c(clean_vec(singles)[9], clean_vec(doubles)[9])
+  )
+  overview
+}
+
+#' @rdname wta_get_player_overview
+#' @export
+get_singles_and_doubles <- wta_get_player_overview
+
+# -------------------------------------------------------------------------
+#  Player matches ----------------------------------------------------------
+
+#' @title Get full match list for a player
+#' @param player_url Character. Must point to the #matches section or the base
+#'   URL (the function appends `#matches`).
+#' @return A nested tibble with one row per season and a `matches` list column
+#'   containing a tidy data‑frame of that season.
+#' @export
+#' @importFrom dplyr rename mutate
+#' @importFrom purrr map_df
+wta_get_player_matches <- function(player_url) {
+  if (!grepl("#matches$", player_url)) player_url <- paste0(player_url, "#matches")
+
+  page <- .read_html_dynamic(player_url,
+                             click_more_selector = ".player-matches__more-button")
+
+  season_blocks <- page |>
+    rvest::html_nodes(".player-matches__content")
+
+  years <- season_blocks |>
+    rvest::html_node(".player-matches__header-cell") |>
+    rvest::html_text(trim = TRUE) |>
+    stringr::str_extract("\\d{4}")
+
+  extract_table <- function(node) {
+    node |>
+      rvest::html_nodes("table") |>
+      purrr::map_df(rvest::html_table, fill = TRUE)
+  }
+
+  tibble::tibble(
+    season  = years,
+    matches = purrr::map(season_blocks, extract_table)
+  )
+}
+
+

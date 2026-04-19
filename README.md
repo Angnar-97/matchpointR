@@ -1,0 +1,78 @@
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# matchpointR <a href="https://github.com/Angnar-97/matchpointR"><img src="man/figures/logo.png" align="right" height="120" alt="matchpointR logo"/></a>
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/Angnar-97/matchpointR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Angnar-97/matchpointR/actions/workflows/R-CMD-check.yaml)
+[![CRAN status](https://www.r-pkg.org/badges/version/matchpointR)](https://CRAN.R-project.org/package=matchpointR)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
+**matchpointR** turns the public pages of the Women's Tennis Association
+(<https://www.wtatennis.com>) into tidy data frames. It ships helpers for
+player biographies, singles and doubles career overviews, full match
+histories, live rankings and aggregate tour statistics.
+
+Dynamic content (matches, rankings, stats) is rendered through a headless
+Chrome session via [`chromote`](https://cran.r-project.org/package=chromote),
+so JavaScript-generated sections are fully captured before parsing.
+
+## Installation
+
+You can install the development version of `matchpointR` from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("pak")
+pak::pak("Angnar-97/matchpointR")
+```
+
+Or, once it lands on CRAN:
+
+``` r
+install.packages("matchpointR")
+```
+
+You will also need a working Chrome/Chromium install for the dynamic
+scrapers, which is managed automatically by `chromote`.
+
+## Usage
+
+``` r
+library(matchpointR)
+
+# Build a canonical player URL from id + slug
+url <- wta_player_url(320301, "katerina-siniakova")
+
+# Player biography
+wta_get_player_basics(url, download_images = FALSE)
+
+# Singles / Doubles overview
+wta_get_player_overview(url)
+
+# Full match history (walks the "Show more" button)
+wta_get_player_matches(url)
+
+# Live rankings
+wta_get_rankings("singles", top = 50)
+
+# Statistics leaderboards
+wta_get_stats("aces", top = 25)
+```
+
+## Scope and caveats
+
+- `matchpointR` targets **public** WTA pages. Respect the site's terms
+  of service and rate limits when scraping at scale.
+- HTML selectors may drift as the site is redesigned. File an issue on
+  GitHub if a function stops returning data.
+- Functions return everything as character to stay faithful to the
+  rendered page; cast to numeric or date in a follow-up step.
+
+## License
+
+Apache License (>= 2). See [LICENSE](LICENSE).
+
+## Author
+
+Alejandro Navas González (Angnar).
