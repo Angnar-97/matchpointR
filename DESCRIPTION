@@ -26,6 +26,7 @@ Depends:
 Imports:
     chromote,
     cli,
+    jsonlite,
     magick,
     purrr,
     rvest,

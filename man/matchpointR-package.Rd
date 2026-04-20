@@ -8,22 +8,24 @@
 \description{
 \code{matchpointR} is a small scraper toolkit that turns the public pages of
 \url{https://www.wtatennis.com} into tidy data frames. It ships helpers for
-player biographies, singles and doubles overviews, full match histories,
-live rankings and aggregate tour statistics.
+player biographies, career highlights, full match histories and live
+rankings.
 }
 \details{
 Dynamic content is rendered through a headless Chrome session using the
 \pkg{chromote} package, so JavaScript-generated sections (matches,
-rankings, stats) are fully captured before parsing.
+rankings) are fully captured before parsing. Where possible the package
+reads structured JSON-LD (schema.org) data instead of scraping CSS
+classes, for resilience against site redesigns.
 }
 \section{Main functions}{
 
 \itemize{
+\item \code{\link[=wta_player_url]{wta_player_url()}}
 \item \code{\link[=wta_get_player_basics]{wta_get_player_basics()}}
 \item \code{\link[=wta_get_player_overview]{wta_get_player_overview()}}
 \item \code{\link[=wta_get_player_matches]{wta_get_player_matches()}}
 \item \code{\link[=wta_get_rankings]{wta_get_rankings()}}
-\item \code{\link[=wta_get_stats]{wta_get_stats()}}
 }
 }
 

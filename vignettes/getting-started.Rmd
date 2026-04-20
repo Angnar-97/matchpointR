@@ -21,21 +21,22 @@ library(matchpointR)
 
 ## Overview
 
-`matchpointR` provides a small, consistent family of functions for
-scraping [wtatennis.com](https://www.wtatennis.com) into tidy data
-frames:
+`matchpointR` turns the public pages of
+[wtatennis.com](https://www.wtatennis.com) into tidy data frames:
 
-| Function                      | Purpose                                    |
-|-------------------------------|--------------------------------------------|
-| `wta_player_url()`            | Build canonical player URLs.               |
-| `wta_get_player_basics()`     | One-row tibble with bio + images.          |
-| `wta_get_player_overview()`   | Singles & Doubles career highlights.       |
-| `wta_get_player_matches()`    | One row per match, entire history.         |
-| `wta_get_rankings()`          | Current singles / doubles leaderboard.     |
-| `wta_get_stats()`             | Stat leaderboards (aces, winners, ...).    |
+| Function                      | Purpose                                                   |
+|-------------------------------|-----------------------------------------------------------|
+| `wta_player_url()`            | Build canonical player URLs.                              |
+| `wta_get_player_basics()`     | One-row tibble with bio parsed from the page's JSON-LD.   |
+| `wta_get_player_overview()`   | Career highlights (ranks, titles, prize money).           |
+| `wta_get_player_matches()`    | One row per match across the full career.                 |
+| `wta_get_rankings()`          | Current singles / doubles leaderboard.                    |
 
-Every function that talks to the network opens (and closes) its own
-headless Chrome session through `chromote`.
+Every function that hits the network opens (and closes) its own headless
+Chrome session through `chromote`. Where the WTA site exposes structured
+schema.org JSON-LD data, `matchpointR` reads from that in preference to
+CSS selectors — this is substantially more resilient against site
+redesigns.
 
 ## A worked example: Kateřina Siniaková
 
@@ -47,25 +48,30 @@ bio
 ```
 
 `download_images = TRUE` (the default) additionally downloads the
-headshot and the nationality flag into `magick-image` list-columns — set
-it to `FALSE` when you only need the metadata.
+headshot into a `magick-image` list-column — set it to `FALSE` when you
+only need the metadata.
 
-### Singles vs Doubles highlights
+### Career highlights
 
 ```{r}
 wta_get_player_overview(url)
 ```
 
+Returns a long tibble with one row per metric:
+`singles_rank`, `doubles_rank`, `singles_career_titles`,
+`doubles_career_titles`, `career_prize_money`, `career_high`.
+
 ### Full match history
 
 ```{r}
-matches <- wta_get_player_matches(url)
+matches_url <- wta_player_url(320301, "katerina-siniakova", "matches")
+matches <- wta_get_player_matches(matches_url)
 head(matches)
 ```
 
-`wta_get_player_matches()` clicks the *Show more* button repeatedly until
-no more matches are loaded. Raise `max_clicks` only if you hit the
-safety cap on a very long career.
+`wta_get_player_matches()` clicks the *Show more* button repeatedly
+until no more matches are loaded. Raise `max_clicks` only if you hit
+the safety cap on a very long career.
 
 ## Tour-wide data
 
@@ -76,17 +82,6 @@ wta_get_rankings("singles", top = 50)
 wta_get_rankings("doubles", top = 50)
 ```
 
-### Statistical leaderboards
-
-```{r}
-wta_get_stats("aces", top = 25)
-wta_get_stats("first-serve-percentage", top = 25)
-```
-
-The `metric` argument maps directly to the path segment at
-`https://www.wtatennis.com/stats/<metric>`. Browse the site for the
-available slugs.
-
 ## Tips
 
 - **Coercion.** All columns are returned as character to stay faithful
@@ -95,3 +90,11 @@ available slugs.
   site's CSS classes have probably been renamed — open an issue.
 - **Rate limiting.** `chromote` hits the site as a real browser; be
   considerate if you are iterating over many players.
+
+## Not yet covered
+
+Tour-wide statistics leaderboards (aces, winners, break-points
+converted, …) are tracked in
+[issue #1](https://github.com/Angnar-97/matchpointR/issues/1) for a
+future release. The WTA site reshuffled its `/stats` hub and we are
+waiting for a stable URL pattern before committing to an API.

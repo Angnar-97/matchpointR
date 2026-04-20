@@ -2,25 +2,26 @@
 % Please edit documentation in R/players.R
 \name{wta_get_player_matches}
 \alias{wta_get_player_matches}
-\title{Get the full match list for a WTA player}
+\title{Get the match history for a WTA player}
 \usage{
 wta_get_player_matches(player_url, max_clicks = 50L)
 }
 \arguments{
-\item{player_url}{Character. Must point to the player page; the function
-appends \verb{#matches} automatically when missing.}
+\item{player_url}{Character. URL to the player page; the function
+normalises to the \verb{/matches} path automatically.}
 
 \item{max_clicks}{Integer. Safety cap for the "Show more" click loop.
 Defaults to 50.}
 }
 \value{
 A \code{\link[tibble:tibble]{tibble::tibble()}} with one row per match and columns:
-\code{date}, \code{tournament}, \code{round}, \code{opponent}, \code{score}.
+\code{tournament}, \code{tournament_date}, \code{round}, \code{opponent}, \code{opponent_seed},
+\code{opponent_country}, \code{opponent_rank}, \code{score}, \code{result}.
 }
 \description{
-Walks the dynamic "Matches" section of a player page, clicking the
+Walks the dynamic "Matches" page of a player profile, clicking the
 "Show more" button until the full history is loaded, and returns one row
-per match.
+per match with tournament, round, opponent, score and result.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}

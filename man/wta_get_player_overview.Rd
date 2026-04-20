@@ -2,7 +2,7 @@
 % Please edit documentation in R/players.R
 \name{wta_get_player_overview}
 \alias{wta_get_player_overview}
-\title{Get the Singles / Doubles overview panel for a player}
+\title{Get a WTA player's career highlights}
 \usage{
 wta_get_player_overview(player_url)
 }
@@ -10,15 +10,16 @@ wta_get_player_overview(player_url)
 \item{player_url}{Character. URL to the player overview page.}
 }
 \value{
-A \code{\link[tibble:tibble]{tibble::tibble()}} with two rows (\code{Singles}, \code{Doubles}) and
-columns: \code{current_ranking}, \code{career_high}, \code{win_rate_year},
-\code{win_rate_career}, \code{year_titles}, \code{career_titles}, \code{prize_money_year},
-\code{prize_money_career}.
+A long-format \code{\link[tibble:tibble]{tibble::tibble()}} with columns \code{metric} and
+\code{value}. Rows include \code{singles_rank}, \code{doubles_rank},
+\code{singles_career_titles}, \code{doubles_career_titles},
+\code{career_prize_money}, \code{career_high}.
 }
 \description{
-Clicks the Singles and Doubles tabs in the profile header and parses the
-highlighted statistics (current ranking, career high, titles, win rate,
-prize money).
+Returns the structured "additional properties" block from the page's
+JSON-LD: current singles and doubles rank, career titles, career prize
+money. Supplements with the career-high singles rank read from the bio
+side panel.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}

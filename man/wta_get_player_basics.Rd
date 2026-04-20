@@ -7,34 +7,32 @@
 wta_get_player_basics(player_url, download_images = TRUE)
 }
 \arguments{
-\item{player_url}{Character. Full URL to a player page (either the
-overview or matches section). Build it with \code{\link[=wta_player_url]{wta_player_url()}} if
-you only have the numeric id.}
+\item{player_url}{Character. Full URL to a player page. Build it with
+\code{\link[=wta_player_url]{wta_player_url()}} if you only have the numeric id.}
 
-\item{download_images}{Logical. When \code{TRUE} (default) the headshot and
-flag are downloaded into \code{magick-image} objects. Set to \code{FALSE} to
-return only the URLs and avoid network I/O.}
+\item{download_images}{Logical. When \code{TRUE} (default) the headshot is
+downloaded into a \code{magick-image} object. Set to \code{FALSE} to skip the
+network round-trip and return only the image URL.}
 }
 \value{
 A one-row \code{\link[tibble:tibble]{tibble::tibble()}} with columns:
 \describe{
-\item{\code{name}}{Player display name.}
-\item{\code{birth_date}}{Date of birth as shown on the profile (character).}
-\item{\code{nationality}}{Nationality label.}
-\item{\code{birth_place}}{Birth place string.}
-\item{\code{height}}{Height as shown (usually \code{cm / feet-inches}).}
-\item{\code{handedness}}{Dominant hand.}
-\item{\code{player_image_url} / \code{player_image}}{Headshot URL and
-(optionally) its \code{magick-image}.}
-\item{\code{nationality_flag_url} / \code{nationality_flag}}{Flag URL and
-(optionally) the parsed SVG.}
+\item{\code{player_id}}{Numeric WTA id parsed from \verb{@id}.}
+\item{\code{name}, \code{given_name}, \code{family_name}}{Name fields.}
+\item{\code{birth_date}}{Date of birth (ISO 8601 character).}
+\item{\code{nationality}, \code{birth_place}, \code{birth_country}}{Geography fields.}
+\item{\code{height}}{Height string as shown on the bio (e.g. \verb{5' 9" (1.74m)}).}
+\item{\code{handedness}}{Dominant hand (\code{"Right-Handed"} / \code{"Left-Handed"}).}
+\item{\code{player_image_url}}{Headshot URL.}
+\item{\code{player_image}}{\code{magick-image} when \code{download_images = TRUE}.}
 }
 }
 \description{
-Scrapes the profile header of a WTA player page and returns a one-row
+Parses the profile header of a WTA player page and returns a one-row
 tibble with name, nationality, birth date, birth place, height and
-handedness, together with optional \code{magick-image} list-columns for the
-headshot and the nationality flag.
+handedness. The bulk of the data is read from the page's JSON-LD
+(schema.org Person) block, which is more stable than the visual markup;
+height is read from the profile bio block as a fallback.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}

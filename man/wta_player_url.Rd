@@ -4,7 +4,7 @@
 \alias{wta_player_url}
 \title{Build a WTA player URL}
 \usage{
-wta_player_url(id, slug = NULL, section = c("overview", "matches", "stats"))
+wta_player_url(id, slug = NULL, section = c("overview", "matches"))
 }
 \arguments{
 \item{id}{Character or integer. The WTA numeric player id (e.g. \code{320301}).}
@@ -12,8 +12,9 @@ wta_player_url(id, slug = NULL, section = c("overview", "matches", "stats"))
 \item{slug}{Optional character. Player slug (e.g. \code{"katerina-siniakova"}).
 When omitted the URL still resolves — WTA redirects to the canonical one.}
 
-\item{section}{Optional character. Page section to append as a fragment,
-one of \code{"overview"}, \code{"matches"}, \code{"stats"}. Defaults to \code{"overview"}.}
+\item{section}{Optional character. Page section to append as a path
+segment, one of \code{"overview"}, \code{"matches"}. Defaults to \code{"overview"},
+which maps to the bare player URL.}
 }
 \value{
 A single character string with the full URL.
@@ -23,5 +24,6 @@ Convenience wrapper to assemble a canonical player URL from a numeric id
 and an optional slug.
 }
 \examples{
+wta_player_url(320301, "katerina-siniakova")
 wta_player_url(320301, "katerina-siniakova", "matches")
 }

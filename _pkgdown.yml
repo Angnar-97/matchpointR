@@ -1,0 +1,44 @@
+url: https://angnar-97.github.io/matchpointR/
+
+template:
+  bootstrap: 5
+  bslib:
+    primary: "#6f1d1b"      # tennis clay
+    secondary: "#99582a"
+    success: "#669bbc"
+    base_font: {google: "Inter"}
+    heading_font: {google: "Archivo"}
+    code_font: {google: "JetBrains Mono"}
+
+home:
+  title: matchpointR
+  description: Tidy access to Women's Tennis Association (WTA) data.
+
+authors:
+  Alejandro Navas González:
+    href: https://github.com/Angnar-97
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search, github]
+
+reference:
+  - title: Player data
+    desc: Scrape information about individual WTA players.
+    contents:
+      - wta_player_url
+      - wta_get_player_basics
+      - wta_get_player_overview
+      - wta_get_player_matches
+  - title: Tour-wide data
+    desc: Rankings and aggregate statistics across the tour.
+    contents:
+      - wta_get_rankings
+      - wta_get_stats
+
+articles:
+  - title: Get started
+    navbar: ~
+    contents:
+      - getting-started

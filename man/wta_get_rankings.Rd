@@ -4,22 +4,28 @@
 \alias{wta_get_rankings}
 \title{Get the current WTA rankings}
 \usage{
-wta_get_rankings(type = c("singles", "doubles"), top = NULL)
+wta_get_rankings(type = c("singles", "doubles"), top = NULL, wait = 12)
 }
 \arguments{
 \item{type}{Character. One of \code{"singles"}, \code{"doubles"}. Defaults to
 \code{"singles"}.}
 
 \item{top}{Integer. Limit the output to the top \code{N} ranked players.
-\code{NULL} (default) keeps every row rendered by the site.}
+\code{NULL} (default) keeps every row rendered by the page.}
+
+\item{wait}{Numeric. Seconds to wait for the rankings widget to hydrate
+after navigation. Defaults to 12.}
 }
 \value{
-A \code{\link[tibble:tibble]{tibble::tibble()}} with columns: \code{rank}, \code{player}, \code{country},
-\code{age}, \code{points}, \code{tournaments_played}, \code{movement}.
+A \code{\link[tibble:tibble]{tibble::tibble()}} with one row per player and columns:
+\code{rank}, \code{player_id}, \code{player}, \code{country}, \code{age},
+\code{tournaments_played}, \code{points}.
 }
 \description{
-Scrapes the public rankings page at
-\url{https://www.wtatennis.com/rankings} and returns a tidy tibble.
+Scrapes the rankings table at
+\url{https://www.wtatennis.com/rankings/singles} (or \verb{/doubles}) and returns
+a tidy tibble. The initial page renders the first 50 rows; increase the
+browser dwell time with \code{wait} if the widget hasn't hydrated yet.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}

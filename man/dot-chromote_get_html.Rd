@@ -6,7 +6,7 @@
 \usage{
 .chromote_get_html(
   url,
-  wait = 5,
+  wait = 8,
   click_more_selector = NULL,
   scroll = TRUE,
   max_clicks = 50L,
@@ -16,7 +16,7 @@
 \arguments{
 \item{url}{Character. Destination URL.}
 
-\item{wait}{Numeric. Seconds to wait after initial navigation. Default 5.}
+\item{wait}{Numeric. Seconds to wait after initial navigation. Default 8.}
 
 \item{click_more_selector}{Optional CSS selector for a "load more" button
 that should be clicked repeatedly until it disappears.}

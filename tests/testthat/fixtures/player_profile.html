@@ -1,18 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><title>Test Player</title></head>
+<head><meta charset="utf-8"><title>Test Player</title>
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Person",
+    "@id": "https://www.wtatennis.com/players/320301/katerina-siniakova",
+    "name": "Katerina Siniakova",
+    "givenName": "Katerina",
+    "familyName": "Siniakova",
+    "nationality": {"@type": "Country", "name": "Czech Republic"},
+    "birthDate": "1996-05-10",
+    "birthPlace": {
+        "@type": "Place",
+        "address": {
+            "addressLocality": "Hradec Kralove",
+            "addressCountry": "Czech Republic"
+        }
+    },
+    "image": "https://wtafiles.blob.core.windows.net/images/headshots/320301.jpg",
+    "additionalProperty": [
+        {"@type": "PropertyValue", "name": "WTA Singles Rank", "value": "42"},
+        {"@type": "PropertyValue", "name": "WTA Doubles Rank", "value": "2"},
+        {"@type": "PropertyValue", "name": "Plays", "value": "Right-Handed"},
+        {"@type": "PropertyValue", "name": "Singles Career Titles", "value": "5"},
+        {"@type": "PropertyValue", "name": "Doubles Career Titles", "value": "35"},
+        {"@type": "PropertyValue", "name": "Career Prize Money", "value": "$15,787,557"}
+    ]
+}
+</script>
+</head>
 <body>
-<div class="profile-header-info">
+<header class="profile-header">
   <h1 class="profile-header__name">Katerina Siniakova</h1>
-  <span class="profile-header-info__nationality">Czech Republic</span>
-  <img class="profile-header-info__nationalityFlag" src="/flags/cz.svg" />
-  <div class="profile-header-info__detail-stat--small">178 cm</div>
-  <div class="profile-header-info__detail-stat--small">Right</div>
-  <div class="profile-header-info__detail-stat--small">May 10, 1996</div>
-  <div class="profile-header-info__detail-stat--small">Hradec Kralove, Czech Republic</div>
-</div>
-<div class="profile-header-headshot full-body">
-  <img src="https://photo-resources.wtatennis.com/siniakova.png" />
-</div>
+</header>
+<section class="profile-bio">
+  <div class="profile-bio__info-block">
+    <h2 class="profile-bio__info-title">Plays</h2>
+    <span class="profile-bio__info-content"> Right-Handed</span>
+  </div>
+  <div class="profile-bio__info-block">
+    <h2 class="profile-bio__info-title">Career High</h2>
+    <span class="profile-bio__info-content"> 27</span>
+  </div>
+  <div class="profile-bio__info-block">
+    <h2 class="profile-bio__info-title">Height</h2>
+    <span class="profile-bio__info-content">5' 9" (1.74m)</span>
+  </div>
+  <div class="profile-bio__info-block">
+    <h2 class="profile-bio__info-title">Birthday</h2>
+    <span class="profile-bio__info-content">May 10, 1996</span>
+  </div>
+  <div class="profile-bio__info-block">
+    <h2 class="profile-bio__info-title">Birthplace</h2>
+    <span class="profile-bio__info-content">Hradec Kralove, Czech Republic</span>
+  </div>
+</section>
 </body>
 </html>
