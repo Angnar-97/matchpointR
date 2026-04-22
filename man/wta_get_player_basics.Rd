@@ -23,8 +23,14 @@ A one-row \code{\link[tibble:tibble]{tibble::tibble()}} with columns:
 \item{\code{nationality}, \code{birth_place}, \code{birth_country}}{Geography fields.}
 \item{\code{height}}{Height string as shown on the bio (e.g. \verb{5' 9" (1.74m)}).}
 \item{\code{handedness}}{Dominant hand (\code{"Right-Handed"} / \code{"Left-Handed"}).}
-\item{\code{player_image_url}}{Headshot URL.}
-\item{\code{player_image}}{\code{magick-image} when \code{download_images = TRUE}.}
+\item{\code{nationality_code}}{3-letter IOC/ISO code extracted from the flag
+image (e.g. \code{"CZE"}, \code{"USA"}).}
+\item{\code{player_image_url}, \code{nationality_flag_url}}{Headshot and flag URLs.}
+\item{\code{player_image}}{\code{magick-image} of the headshot, when
+\code{download_images = TRUE}.}
+\item{\code{nationality_flag}}{\code{magick-image} of the flag SVG, when
+\code{download_images = TRUE} and the suggested package \pkg{rsvg} is
+installed (otherwise \code{NA}).}
 }
 }
 \description{

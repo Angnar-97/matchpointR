@@ -23,8 +23,14 @@
 #'   \item{`nationality`, `birth_place`, `birth_country`}{Geography fields.}
 #'   \item{`height`}{Height string as shown on the bio (e.g. `5' 9" (1.74m)`).}
 #'   \item{`handedness`}{Dominant hand (`"Right-Handed"` / `"Left-Handed"`).}
-#'   \item{`player_image_url`}{Headshot URL.}
-#'   \item{`player_image`}{`magick-image` when `download_images = TRUE`.}
+#'   \item{`nationality_code`}{3-letter IOC/ISO code extracted from the flag
+#'     image (e.g. `"CZE"`, `"USA"`).}
+#'   \item{`player_image_url`, `nationality_flag_url`}{Headshot and flag URLs.}
+#'   \item{`player_image`}{`magick-image` of the headshot, when
+#'     `download_images = TRUE`.}
+#'   \item{`nationality_flag`}{`magick-image` of the flag SVG, when
+#'     `download_images = TRUE` and the suggested package \pkg{rsvg} is
+#'     installed (otherwise `NA`).}
 #' }
 #' @export
 #' @examplesIf interactive()
@@ -72,22 +78,33 @@ wta_get_player_basics <- function(player_url, download_images = TRUE) {
     name <- .text_or_na(page, ".profile-header__name")
   }
 
+  ## nationality flag (served as SVG from wtatennis.com)
+  flag_url  <- .abs_url(.attr_or_na(page,
+    ".profile-header__flag .flag__img, .profile-header-info__nationalityFlag",
+    "src"))
+  flag_code <- .attr_or_na(page,
+    ".profile-header__flag .flag__img, .profile-header-info__nationalityFlag",
+    "alt")
+
   out <- tibble::tibble(
-    player_id        = player_id,
-    name             = as.character(name),
-    given_name       = as.character(given_name),
-    family_name      = as.character(family_name),
-    birth_date       = as.character(birth_date),
-    nationality      = as.character(nationality),
-    birth_place      = as.character(birth_place),
-    birth_country    = as.character(birth_ctry),
-    height           = as.character(height),
-    handedness       = as.character(handedness),
-    player_image_url = .abs_url(as.character(image_url))
+    player_id            = player_id,
+    name                 = as.character(name),
+    given_name           = as.character(given_name),
+    family_name          = as.character(family_name),
+    birth_date           = as.character(birth_date),
+    nationality          = as.character(nationality),
+    nationality_code     = as.character(flag_code),
+    birth_place          = as.character(birth_place),
+    birth_country        = as.character(birth_ctry),
+    height               = as.character(height),
+    handedness           = as.character(handedness),
+    player_image_url     = .abs_url(as.character(image_url)),
+    nationality_flag_url = flag_url
   )
 
   if (download_images) {
-    out$player_image <- list(.safe_image_read(out$player_image_url))
+    out$player_image     <- list(.safe_image_read(out$player_image_url))
+    out$nationality_flag <- list(.safe_image_read_svg(out$nationality_flag_url))
   }
   out
 }
@@ -97,6 +114,15 @@ wta_get_player_basics <- function(player_url, download_images = TRUE) {
 .safe_image_read <- function(url) {
   if (is.na(url)) return(NA)
   tryCatch(magick::image_read(url), error = function(e) NA)
+}
+
+#' Read an SVG URL into a magick-image via \pkg{rsvg} (suggests)
+#' @keywords internal
+#' @noRd
+.safe_image_read_svg <- function(url) {
+  if (is.na(url)) return(NA)
+  if (!requireNamespace("rsvg", quietly = TRUE)) return(NA)
+  tryCatch(magick::image_read_svg(url), error = function(e) NA)
 }
 
 # -------------------------------------------------------------------------

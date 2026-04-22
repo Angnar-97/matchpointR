@@ -22,6 +22,11 @@ test_that(".parse_player_basics reads JSON-LD + bio", {
     out$player_image_url,
     "https://wtafiles.blob.core.windows.net/images/headshots/320301.jpg"
   )
+  expect_equal(out$nationality_code,     "CZE")
+  expect_equal(
+    out$nationality_flag_url,
+    "https://www.wtatennis.com/resources/v7.32.16/i/elements/flags/cze.svg"
+  )
 })
 
 test_that(".parse_player_overview builds the metric/value long table", {
