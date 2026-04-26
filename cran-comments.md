@@ -1,16 +1,16 @@
-# matchpointR 0.1.0 (resubmission)
+# matchpointR 0.1.0 (resubmission #2)
 
-## Response to Konstanze Lauseker's review (2026-04-23)
+## Response to the second CRAN review
 
-Thank you for the review. Two changes in this resubmission:
+Thank you for the second pass. The reviewer flagged a dangling
+`file://LICENSE` reference in `README.md` left behind after the first
+resubmission removed the `LICENSE` file (per the previous round's
+guidance). Fix in this resubmission:
 
-1. Wrapped software names ('Chrome', 'JavaScript') in single quotes in
-   the `Description` field, per
-   <https://contributor.r-project.org/cran-cookbook/description_issues.html#formatting-software-names>.
-2. Removed the `LICENSE` file and the `| file LICENSE` clause from the
-   `License` field, since the package is released under a plain
-   "Apache License (>= 2)" with no additional restrictions, per
-   <https://contributor.r-project.org/cran-cookbook/description_issues.html#license-files>.
+- Replaced `See [LICENSE](LICENSE)` with a link to the canonical
+  upstream license page,
+  <https://www.apache.org/licenses/LICENSE-2.0>, in both `README.md`
+  and `README.Rmd`. No file URI remains.
 
 No other changes.
 

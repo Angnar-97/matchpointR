@@ -88,7 +88,7 @@ loops.
 
 ## License
 
-Apache License (>= 2). See [LICENSE](LICENSE).
+[Apache License (>= 2)](https://www.apache.org/licenses/LICENSE-2.0).
 
 ## Author
 
