@@ -17,7 +17,8 @@ Description: Scrapes and tidies publicly available data from the
     all outputs are returned as tidy data frames suitable for downstream
     analysis or visualisation.
 License: Apache License (>= 2)
-URL: https://github.com/Angnar-97/matchpointR
+URL: https://github.com/Angnar-97/matchpointR,
+    https://angnar-97.github.io/matchpointR/
 BugReports: https://github.com/Angnar-97/matchpointR/issues
 Encoding: UTF-8
 LazyData: true

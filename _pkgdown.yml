@@ -32,10 +32,9 @@ reference:
       - wta_get_player_overview
       - wta_get_player_matches
   - title: Tour-wide data
-    desc: Rankings and aggregate statistics across the tour.
+    desc: Rankings across the tour.
     contents:
       - wta_get_rankings
-      - wta_get_stats
 
 articles:
   - title: Get started
